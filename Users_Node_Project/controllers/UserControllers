@@ -1,0 +1,38 @@
+const User = require('../models/userModel');
+
+
+exports.AddUser = async(req,res) => {
+    const test = await User.findOne({eMail : req.body.eMail})
+    if (test == null){
+        const user = new User(req.body);
+        await user.save()
+        .then((user) => { return res.status(201).json({user}) })
+        .catch((error) => { return res.status(400).json({error}) });
+    }
+    else {
+        res.send({message : "Utilisateur existe déjà"})
+    }
+}
+
+exports.Login = async (req, res) => {
+    const { eMail, password } = req.body;
+  
+    const userWithEmail = await User.findOne({ eMail : req.body.eMail }).catch(
+      (err) => {
+        console.log("Error: ", err);
+      }
+    );
+  
+    if (!userWithEmail)
+      return res
+        .status(400)
+        .json({ message: "Email does not match!" });
+  
+    if (userWithEmail.password !== password)
+      return res
+        .status(400)
+        .json({ message: "Password does not match!" });
+  
+  
+    res.json({ message: "Welcome"});
+  }
